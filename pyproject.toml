@@ -3,7 +3,7 @@ name = "copairs"
 version = "0.4.1"
 description = "Find pairs and compute metrics between them"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9,<3.12"
 license = {file = "LICENSE.txt"}
 keywords = ["pairwise", "replication"]
 authors = [
@@ -23,9 +23,38 @@ plot = ["plotly"]
 "Bug Reports" = "https://github.com/cytomining/copairs/issues"
 "Source" = "https://github.com/cytomining/copairs/"
 
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
+# [build-system]
+# requires = ["setuptools"]
+# build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"] 
+
+[tool.poetry]
+name = "copairs"
+version = "0.4.1"
+description = "Find pairs and compute metrics between them"
+readme = "README.md"
+license = "LICENSE.txt"
+keywords = ["pairwise", "replication"]
+authors = [
+  "John Arevalo <johnarevalo@gmail.com>",
+]
+packages = [{include = "copairs", from= "src"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.12"
+tqdm = "^4.66.1"
+pandas = ">=2.0.3"
+statsmodels = "^0.14.2"
+
+[tool.poetry.group.dev.dependencies]
+jupytext = "^1.15.0"
+ipdb = "^0.13.13"
+jupyter = "^1.0.0"
+ruff = "<0.2.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
