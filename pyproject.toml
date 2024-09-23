@@ -1,6 +1,6 @@
 [project]
 name = "copairs"
-version = "0.4.1"
+version = "0.4.2"
 description = "Find pairs and compute metrics between them"
 readme = "README.md"
 requires-python = ">=3.9,<3.12"
@@ -45,7 +45,7 @@ packages = [{include = "copairs", from= "src"}]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.12"
 tqdm = "^4.66.1"
-pandas = ">=2.0.3"
+pandas = ">=1.5.3"
 statsmodels = "^0.14.2"
 
 [tool.poetry.group.dev.dependencies]
