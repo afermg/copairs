@@ -517,7 +517,12 @@ def _validate(sameby, diffby):
     return sameby, diffby
 
 
-def find_pairs_multilabel(dframe, sameby, diffby, multilabel_col):
+def find_pairs_multilabel(
+    dframe: Union[pd.DataFrame, duckdb.duckdb.DuckDBPyRelation],
+    sameby: Union[str, ColumnList],
+    diffby: Union[str, ColumnList],
+    multilabel_col: str,
+):
     """
     You can include columns with multiple labels (i.e., a list of identifiers).
     """
