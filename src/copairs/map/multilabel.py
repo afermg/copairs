@@ -130,14 +130,9 @@ def average_precision(
                 "n_pos_pairs": null_confs_list[i][:, 0],
                 "n_total_pairs": null_confs_list[i][:, 1],
                 "ix": ix_list[i],
+                **{col: meta.iloc[key][col] for col in meta.columns},
             }
         )
-        # if hasattr(key, len):
-        #     # Is a ComposedKey
-        # for k, v in zip(key._fields, key):
-        #     result[k] = v
-        # else:
-        #     result[multilabel_col] = key
         results.append(result)
     results = pd.concat(results).reset_index(drop=True)
     meta = meta.drop(multilabel_col, axis=1)

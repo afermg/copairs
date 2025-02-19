@@ -549,7 +549,9 @@ def find_pairs_multilabel(
     -----
     The function asserts that `multilabel_col` is present in either `sameby` or `diffby`.
     """
-    assert (multilabel_col in sameby) or (multilabel_col in diffby), f"Missing {multilabel_col} in sameby and diffby"
+    assert (multilabel_col in sameby) or (multilabel_col in diffby), (
+        f"Missing {multilabel_col} in sameby and diffby"
+    )
 
     df = dframe.reset_index()
 
@@ -559,7 +561,7 @@ def find_pairs_multilabel(
     else:
         diffby.remove(multilabel_col)
         shared_item = False
-        
+
     with duckdb.connect(":memory:"):
         result = duckdb.sql(
             "SELECT * "
@@ -568,7 +570,7 @@ def find_pairs_multilabel(
             " FROM df A JOIN df B ON A.index < B.index)"
             f" WHERE shared_item = {shared_item}"
         )
-        
+
         if len(sameby) or len(diffby):
             monolabel_result = find_pairs(df, sameby, diffby).T
             result = duckdb.sql(
