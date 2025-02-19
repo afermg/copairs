@@ -566,7 +566,7 @@ def find_pairs_multilabel(
             f" FROM (select *,CAST(len(list_intersect(A.{multilabel_col},B.{multilabel_col})) AS BOOL)"
             " AS shared_item "
             " FROM df A JOIN df B ON A.index < B.index)"
-            " WHERE shared_item = {shared_item}"
+            f" WHERE shared_item = {shared_item}"
         )
         
         if len(sameby) or len(diffby):
