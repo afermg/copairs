@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
-from copairs.timing import timing
+# from copairs.timing import timing
 
 logger = logging.getLogger("copairs")
 ColumnList = Union[Sequence[str], pd.Index]
@@ -468,7 +468,7 @@ class MatcherMultilabel:
         return {None: list(filter(filter_fn, all_pairs))}
 
 
-@timing
+# @timing
 def find_pairs(
     dframe: Union[pd.DataFrame, duckdb.duckdb.DuckDBPyRelation],
     sameby: Union[str, ColumnList],
@@ -502,7 +502,8 @@ def find_pairs(
         )
         index_d = duckdb.sql(string).fetchnumpy()
 
-        return np.array((index_d["index"], index_d["index_1"]), dtype=np.uint32).T
+        result = np.array((index_d["index"], index_d["index_1"]), dtype=np.uint32).T
+        return result
 
 
 def _validate(sameby, diffby):
@@ -527,15 +528,27 @@ def find_pairs_multilabel(
     You can include columns with multiple labels (i.e., a list of identifiers).
     """
 
+    assert (multilabel_col in sameby) or (multilabel_col in diffby), f"Missing {multilabel_col} in sameby and diffby"
+
     nested_col = multilabel_col + "_nested"
     indexed = dframe.rename({multilabel_col: nested_col}, axis=1).reset_index()
 
-    # Unnest (i.e., explode) the multilabel column and proceed as normal
+    if multilabel_col in sameby:
+        sameby.remove(multilabel_col)
+        shared_item = True
+    else:
+        diffby.remove(multilabel_col)
+        shared_item = False
+        
     with duckdb.connect(":memory:"):
-        unnested = duckdb.sql(
-            f"SELECT *,UNNEST({nested_col}) AS {multilabel_col} FROM indexed"
-        )
+        result = duckdb.sql(f"SELECT * FROM (select *,CAST(len(list_intersect(A.{nested_col},B.{nested_col})) AS BOOL) AS shared_item FROM indexed A JOIN indexed B ON A.index < B.index) WHERE shared_item = {shared_item}")
+        
+        if len(sameby) or len(diffby):
+            monolabel_result = find_pairs(indexed, sameby, diffby).T
+            result = duckdb.sql(f"SELECT index, index_1 FROM result A JOIN monolabel_result B ON A.index = B.column0 AND A.index_1 = B.column1")
 
-    pairs = find_pairs(unnested, sameby, diffby)
+        index_d = result.fetchnumpy()
+        result = np.array((index_d["index"], index_d["index_1"]), dtype=np.uint32).T
 
-    return pairs
+    return result
+

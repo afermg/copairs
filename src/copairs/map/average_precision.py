@@ -9,8 +9,8 @@ import pandas as pd
 
 from copairs import compute
 from copairs.matching import UnpairedException, find_pairs
-from copairs.timing import timing
 
+# from copairs.timing import timing
 from .filter import evaluate_and_filter, flatten_str_list, validate_pipeline_input
 
 logger = logging.getLogger("copairs")
@@ -221,7 +221,7 @@ def average_precision(
     return meta
 
 
-@timing
+# @timing
 def p_values(dframe: pd.DataFrame, null_size: int, seed: int) -> np.ndarray:
     """Compute p-values for average precision scores based on a null distribution.
 
