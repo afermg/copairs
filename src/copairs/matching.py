@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
+# from copairs.timing import timing
+
 logger = logging.getLogger("copairs")
 ColumnList = Union[Sequence[str], pd.Index]
 ColumnDict = Dict[str, ColumnList]
@@ -466,18 +468,27 @@ class MatcherMultilabel:
         return {None: list(filter(filter_fn, all_pairs))}
 
 
-def find_pairs(dframe, sameby, diffby, rev=False) -> np.ndarray:
+# @timing
+def find_pairs(
+    dframe: Union[pd.DataFrame, duckdb.duckdb.DuckDBPyRelation],
+    sameby: Union[str, ColumnList],
+    diffby: Union[str, ColumnList],
+    rev: bool = False,
+) -> np.ndarray:
     """Find the indices pairs sharing values in `sameby` columns but not on `diffby` columns.
 
-    `rev` reverses same and diff, which means that we get the complement
+    If `rev`  is True sameby and diffby are swapped.
     """
     sameby, diffby = _validate(sameby, diffby)
 
     if len(set(sameby).intersection(diffby)):
         raise ValueError("sameby and diffby must be disjoint lists")
 
-    df = dframe.reset_index()
+    df = dframe
+    if isinstance(df, pd.DataFrame):
+        df = dframe.reset_index()
     with duckdb.connect(":memory:"):
+        # If rev is True, diffby and sameby are swapped
         group_1, group_2 = [
             [f"{('', 'NOT')[i - rev]} A.{x} = B.{x}" for x in y]
             for i, y in enumerate((sameby, diffby))
@@ -491,7 +502,8 @@ def find_pairs(dframe, sameby, diffby, rev=False) -> np.ndarray:
         )
         index_d = duckdb.sql(string).fetchnumpy()
 
-        return np.array((index_d["index"], index_d["index_1"]), dtype=np.uint32).T
+        result = np.array((index_d["index"], index_d["index_1"]), dtype=np.uint32).T
+        return result
 
 
 def _validate(sameby, diffby):
@@ -504,3 +516,39 @@ def _validate(sameby, diffby):
         raise ValueError("at least one should be provided")
 
     return sameby, diffby
+
+
+def find_pairs_multilabel(
+    dframe: Union[pd.DataFrame, duckdb.duckdb.DuckDBPyRelation],
+    sameby: Union[str, ColumnList],
+    diffby: Union[str, ColumnList],
+    multilabel_col: str,
+):
+    """
+    You can include columns with multiple labels (i.e., a list of identifiers).
+    """
+
+    assert (multilabel_col in sameby) or (multilabel_col in diffby), f"Missing {multilabel_col} in sameby and diffby"
+
+    nested_col = multilabel_col + "_nested"
+    indexed = dframe.rename({multilabel_col: nested_col}, axis=1).reset_index()
+
+    if multilabel_col in sameby:
+        sameby.remove(multilabel_col)
+        shared_item = True
+    else:
+        diffby.remove(multilabel_col)
+        shared_item = False
+        
+    with duckdb.connect(":memory:"):
+        result = duckdb.sql(f"SELECT * FROM (select *,CAST(len(list_intersect(A.{nested_col},B.{nested_col})) AS BOOL) AS shared_item FROM indexed A JOIN indexed B ON A.index < B.index) WHERE shared_item = {shared_item}")
+        
+        if len(sameby) or len(diffby):
+            monolabel_result = find_pairs(indexed, sameby, diffby).T
+            result = duckdb.sql(f"SELECT index, index_1 FROM result A JOIN monolabel_result B ON A.index = B.column0 AND A.index_1 = B.column1")
+
+        index_d = result.fetchnumpy()
+        result = np.array((index_d["index"], index_d["index_1"]), dtype=np.uint32).T
+
+    return result
+
