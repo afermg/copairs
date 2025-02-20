@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 
-# from copairs.timing import timing
+from copairs.timing import timing
 
 logger = logging.getLogger("copairs")
 ColumnList = Union[Sequence[str], pd.Index]
@@ -468,7 +468,7 @@ class MatcherMultilabel:
         return {None: list(filter(filter_fn, all_pairs))}
 
 
-# @timing
+@timing
 def find_pairs(
     dframe: Union[pd.DataFrame, duckdb.duckdb.DuckDBPyRelation],
     sameby: Union[str, ColumnList],
