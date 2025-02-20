@@ -14,6 +14,7 @@ from copairs.timing import timing
 logger = logging.getLogger("copairs")
 
 
+@timing
 def mean_average_precision(
     ap_scores: pd.DataFrame,
     sameby,
@@ -69,7 +70,6 @@ def mean_average_precision(
     ap_scores["null_ix"] = rev_ix
 
     # Function to calculate the p-value for a mAP score based on the null distribution
-    @timing
     def get_p_value(params):
         map_score, indices = params
         null_dist = null_dists[rev_ix[indices]].mean(axis=0)
@@ -89,12 +89,18 @@ def mean_average_precision(
 
     # Compute p-values for each group using the null distributions
     params = map_scores[["mean_average_precision", "indices"]]
-    map_scores["p_value"] = thread_map(
-        get_p_value, params.values, leave=False, max_workers=max_workers
-    )
+
+    @timing
+    def get_p_value_threaded(params, max_workers):
+        # We cannot test p values individually while cleaning cache
+        return thread_map(
+            get_p_value, params.values, leave=False, max_workers=max_workers
+        )
+
+    map_scores["p_value"] = get_p_value_threaded(params, max_workers)
 
     # Perform multiple testing correction on p-values
-    reject, pvals_corrected, alphacSidak, alphacBonf = multipletests(
+    reject, pvals_corrected, alphacSidak, alphacBonf = timing(multipletests)(
         map_scores["p_value"], method="fdr_bh"
     )
     map_scores["corrected_p_value"] = pvals_corrected
