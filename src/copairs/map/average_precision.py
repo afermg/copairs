@@ -16,6 +16,7 @@ from .filter import evaluate_and_filter, flatten_str_list, validate_pipeline_inp
 logger = logging.getLogger("copairs")
 
 
+@timing
 def build_rank_lists(
     pos_pairs: np.ndarray,
     neg_pairs: np.ndarray,
@@ -222,7 +223,6 @@ def average_precision(
     return meta
 
 
-@timing
 def p_values(dframe: pd.DataFrame, null_size: int, seed: int) -> np.ndarray:
     """Compute p-values for average precision scores based on a null distribution.
 

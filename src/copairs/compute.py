@@ -9,6 +9,8 @@ from typing import Callable, Tuple, Union
 import numpy as np
 from tqdm.autonotebook import tqdm
 
+from copairs.timing import timing
+
 
 def parallel_map(par_func: Callable[[int], None], items: np.ndarray) -> None:
     """Execute a function in parallel over a list of items.
