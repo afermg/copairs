@@ -9,6 +9,7 @@ keywords = ["pairwise", "replication"]
 authors = [
   { name = "John Arevalo", email = "johnarevalo@gmail.com" },
   { name = "Alexandr Kalinin", email = "akalinin@broadinstitute.org" }
+  { name = "Alan F. Munoz", email = "amunozgo@broadinstitute.org" }
 ]
 dependencies = [
   "pandas",
