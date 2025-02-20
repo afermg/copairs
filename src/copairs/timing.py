@@ -1,19 +1,49 @@
 from functools import wraps
 from time import time
 
-import numpy as np
-
 def timing(f):
+    """
+    A decorator that prints the execution time and arguments of a function.
+
+    Parameters
+    ----------
+    f : callable
+        The function to be decorated.
+
+    Returns
+    -------
+    wrap : callable
+        The decorated function.
+
+    Notes
+    -----
+    This decorator uses the `time` module to calculate the execution time.
+    """
     @wraps(f)
     def wrap(*args, **kw):
-        ts = time()
+        """
+        A wrapper function that calculates the execution time and prints it.
+
+        Parameters
+        ----------
+        *args : tuple
+            Variable number of positional arguments.
+        **kw : dict
+            Variable number of keyword arguments.
+
+        Returns
+        -------
+        result : any
+            The result of the decorated function.
+        """
+        ts = time.time()
         result = f(*args, **kw)
-        te = time()
+        te = time.time()
         args_to_print = list(args)
-        args_to_print = [len(x) if len(x)>4 else x for x in args]
+        args_to_print = [len(x) if len(str(x)) > 4 else x for x in args]
 
         print(
-            "func:%r args:[%r, %r] took: %2.4f sec"
+            "func:%r args:[%s, %r] took: %2.4f sec"
             % (f.__name__, args_to_print, kw, te - ts)
         )
         return result
