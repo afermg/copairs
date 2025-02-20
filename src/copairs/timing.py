@@ -1,6 +1,8 @@
 """Decorator to benchmark speed."""
+
 import time
 from functools import wraps
+
 
 def timing(f):
     """
@@ -20,6 +22,7 @@ def timing(f):
     -----
     This decorator uses the `time` module to calculate the execution time.
     """
+
     @wraps(f)
     def wrap(*args, **kw):
         """
