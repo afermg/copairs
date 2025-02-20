@@ -1,7 +1,16 @@
 """Decorator to benchmark speed."""
+from pathlib import Path
 
 import time
 from functools import wraps
+        
+def rmtree(f: Path):
+    if f.is_file():
+        f.unlink()
+    elif f.exists():
+        for child in f.iterdir():
+            rmtree(child)
+        f.rmdir()
 
 
 def timing(f):
@@ -40,11 +49,14 @@ def timing(f):
         result : any
             The result of the decorated function.
         """
+        # Remove cache for proper timing
+        rmtree(Path.home() / ".copairs")
+        
         ts = time.time()
         result = f(*args, **kw)
         te = time.time()
         args_to_print = list(args)
-        args_to_print = [len(x) if len(str(x)) > 4 else x for x in args]
+        args_to_print = [len(x) if hasattr(x, "__iter__") and len(x) > 4 else x for x in args]
 
         print(
             "func:%r args:[%s, %r] took: %2.4f sec"

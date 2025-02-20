@@ -225,6 +225,7 @@ def average_precision(
     return meta
 
 
+@timing
 def p_values(dframe: pd.DataFrame, null_size: int, seed: int) -> np.ndarray:
     """Compute p-values for average precision scores based on a null distribution.
 

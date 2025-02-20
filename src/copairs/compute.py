@@ -229,6 +229,7 @@ def pairwise_chebyshev(x_sample: np.ndarray, y_sample: np.ndarray) -> np.ndarray
     return 1 / (1 + c_dist)
 
 
+@timing
 def get_distance_fn(distance: Union[str, Callable]) -> Callable:
     """Retrieve a distance metric function based on a string identifier or custom callable.
 
@@ -457,6 +458,7 @@ def null_dist_cached(
     return null_dist
 
 
+@timing
 def get_null_dists(confs: np.ndarray, null_size: int, seed: int) -> np.ndarray:
     """Generate null distributions for each configuration of positive and total pairs.
 
@@ -499,6 +501,7 @@ def get_null_dists(confs: np.ndarray, null_size: int, seed: int) -> np.ndarray:
     return null_dists
 
 
+@timing
 def p_values(ap_scores: np.ndarray, null_confs: np.ndarray, null_size: int, seed: int):
     """Calculate p-values for an array of Average Precision (AP) scores using a null distribution.
 
