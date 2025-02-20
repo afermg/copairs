@@ -64,8 +64,8 @@ def timing(f):
         ]
 
         print(
-            "func:%r args:[%s, %r] took: %2.4f sec"
-            % (f.__name__, args_to_print, kw, te - ts)
+            "func:%r %2.4f sec args:[%s, %r]"
+            % (f.__name__,te-ts, args_to_print, kw)
         )
         return result
 

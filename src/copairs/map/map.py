@@ -100,7 +100,7 @@ def mean_average_precision(
     map_scores["p_value"] = get_p_value_threaded(params, max_workers)
 
     # Perform multiple testing correction on p-values
-    reject, pvals_corrected, alphacSidak, alphacBonf = timing(multipletests)(
+    reject, pvals_corrected, alphacSidak, alphacBonf = multipletests(
         map_scores["p_value"], method="fdr_bh"
     )
     map_scores["corrected_p_value"] = pvals_corrected
