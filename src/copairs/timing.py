@@ -1,9 +1,10 @@
+"""Decorator to benchmark speed."""
 import time
 from functools import wraps
 
 def timing(f):
     """
-    A decorator that prints the execution time and arguments of a function.
+    Print the execution time and arguments of a function.
 
     Parameters
     ----------
@@ -22,7 +23,7 @@ def timing(f):
     @wraps(f)
     def wrap(*args, **kw):
         """
-        A wrapper function that calculates the execution time and prints it.
+        Wrap a function to calculate the execution time and print it.
 
         Parameters
         ----------
