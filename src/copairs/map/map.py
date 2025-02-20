@@ -9,6 +9,7 @@ from statsmodels.stats.multitest import multipletests
 from tqdm.contrib.concurrent import thread_map
 
 from copairs import compute
+from copairs.timing import timing
 
 logger = logging.getLogger("copairs")
 
@@ -68,6 +69,7 @@ def mean_average_precision(
     ap_scores["null_ix"] = rev_ix
 
     # Function to calculate the p-value for a mAP score based on the null distribution
+    @timing
     def get_p_value(params):
         map_score, indices = params
         null_dist = null_dists[rev_ix[indices]].mean(axis=0)
