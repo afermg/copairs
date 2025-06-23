@@ -1,11 +1,11 @@
 """Sample pairs with given column restrictions."""
 
-import re
-import logging
 import itertools
+import logging
+import re
+from collections import namedtuple
 from copy import copy
 from math import comb
-from collections import namedtuple
 from typing import Dict, Sequence, Set, Tuple, Union
 
 import duckdb
